@@ -19,8 +19,4 @@
     <ProjectReference Include="..\AuthServer.SharedLibrary\AuthServer.SharedLibrary.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Validations\" />
-  </ItemGroup>
-
 </Project>
