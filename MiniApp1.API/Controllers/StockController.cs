@@ -10,6 +10,7 @@ namespace MiniApp1.API.Controllers
     [ApiController]
     public class StockController : ControllerBase
     {
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult GetStock()
         {

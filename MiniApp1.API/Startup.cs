@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MiniApp1.API.Requirements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,18 @@ namespace MiniApp1.API
 
             services.AddCustomTokenAuth(tokenOptions);
 
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("CityPolicy",policy =>
+                {
+                    policy.RequireClaim("City","Konya");
+                });
+
+                opt.AddPolicy("AgePolicy",policy =>
+                {
+                    policy.Requirements.Add(new BirthDateRequirement(18));
+                });
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
