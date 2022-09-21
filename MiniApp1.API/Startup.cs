@@ -1,5 +1,6 @@
 using AuthServer.SharedLibrary.Configurations;
 using AuthServer.SharedLibrary.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -34,6 +35,7 @@ namespace MiniApp1.API
 
             services.AddCustomTokenAuth(tokenOptions);
 
+            services.AddSingleton<IAuthorizationHandler,BirthDayRequirementHandler>();
             services.AddAuthorization(opt =>
             {
                 opt.AddPolicy("CityPolicy",policy =>
