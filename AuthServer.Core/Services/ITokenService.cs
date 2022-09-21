@@ -1,12 +1,13 @@
 ﻿using AuthServer.Core.Configurations;
 using AuthServer.Core.DTOs;
 using AuthServer.Core.Models;
+using System.Threading.Tasks;
 
 namespace AuthServer.Core.Services
 {
     public interface ITokenService
     {
-        TokenDto CreateToken(UserApp userApp);
+        Task<TokenDto> CreateToken(UserApp userApp);
 
         ClientTokenDto CreateTokenByClient(Client client);
     }

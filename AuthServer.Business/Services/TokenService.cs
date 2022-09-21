@@ -42,8 +42,9 @@ namespace AuthServer.Business.Services
             return Convert.ToBase64String(numberByte);
         }
 
-        private IEnumerable<Claim> GetClaims(UserApp userApp, List<String> audiences)
+        private async Task<IEnumerable<Claim>> GetClaims(UserApp userApp, List<String> audiences)
         {
+            var userRoles = await _userManager.GetRolesAsync(userApp);
             var userList = new List<Claim> {
             new Claim(ClaimTypes.NameIdentifier,userApp.Id),
             new Claim(JwtRegisteredClaimNames.Email, userApp.Email),
@@ -52,6 +53,7 @@ namespace AuthServer.Business.Services
             };
 
             userList.AddRange(audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
+            userList.AddRange(userRoles.Select(x => new Claim(ClaimTypes.Role,x)));
 
             return userList;
         }
@@ -67,7 +69,7 @@ namespace AuthServer.Business.Services
             return claims;
         }
 
-        public TokenDto CreateToken(UserApp userApp)
+        public async Task<TokenDto> CreateToken(UserApp userApp)
         {
             var accessTokenExpiration = DateTime.Now.AddMinutes(_tokenOption.AccessTokenExpiration);
             var refreshTokenExpiration = DateTime.Now.AddMinutes(_tokenOption.RefreshTokenExpiration);
@@ -79,7 +81,7 @@ namespace AuthServer.Business.Services
                 issuer: _tokenOption.Issuer,
                 expires: accessTokenExpiration,
                  notBefore: DateTime.Now,
-                 claims: GetClaims(userApp, _tokenOption.Audience),
+                 claims: await GetClaims(userApp, _tokenOption.Audience),
                  signingCredentials: signingCredentials);
 
             var handler = new JwtSecurityTokenHandler();

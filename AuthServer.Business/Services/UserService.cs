@@ -15,10 +15,12 @@ namespace AuthServer.Business.Services
     public class UserService : IUserService
     {
         private readonly UserManager<UserApp> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserService(UserManager<UserApp> userManager)
+        public UserService(UserManager<UserApp> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<Response<UserAppDto>> CreateUserAsync(CreateUserDto createUserDto)
@@ -35,6 +37,20 @@ namespace AuthServer.Business.Services
             }
             return Response<UserAppDto>.Success(ObjectMapper.Mapper.Map<UserAppDto>(user), 200);
         }
+
+        public async Task<Response<NoContent>> CreateUserRoles(string userName)
+        {
+            if(!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new(){ Name="Admin" });
+                await _roleManager.CreateAsync(new(){ Name="User" });
+            }
+
+            var user = await _userManager.FindByNameAsync(userName);
+            await _userManager.AddToRolesAsync(user,new List<string>(){ "Admin","User" });
+            return Response<NoContent>.Success(201);
+        }
+
 
         public async Task<Response<UserAppDto>> GetUserByNameAsync(string userName)
         {
